@@ -26,3 +26,6 @@ mongoose.connect(
     console.log("MongoDB Connection is Established");
   }
 );
+
+// routes setup
+app.use("/users", require("./routes/userRouter"));
