@@ -13,3 +13,16 @@ const PORT = process.env.PORT || 5000;
 
 // starts the server
 app.listen(PORT, () => console.log(`The Server Has Started on Port: ${PORT}`));
+
+// mongoose setup
+mongoose.connect(
+  process.env.MONGODB_CONNECTION_STRING,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  },
+  (err) => {
+    if (err) throw err;
+    console.log("MongoDB Connection is Established");
+  }
+);
