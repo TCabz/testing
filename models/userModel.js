@@ -1,11 +1,10 @@
 // dependenices
 const mongoose = require("mongoose");
-const { stringify } = require("querystring");
-const userSchema = new mongoose mongoose.Schema({
-      email: { type: stringify, rquired; true },
-      password: { type: stringify, required: true, minlengh: 5 },
-      displayName: { type: String },
+
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true, minlength: 5 },
+  displayName: { type: String },
 });
 
 module.exports = User = mongoose.model("user", userSchema);
-
