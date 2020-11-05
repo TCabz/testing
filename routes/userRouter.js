@@ -2,6 +2,8 @@
 const router = require("express").Router();
 // hash password
 const bcrypt = require("bcryptjs");
+// jason web token package
+const jwt = require("jsonwebtoken");
 // require userModel
 const User = require("../models/userModel");
 
@@ -65,7 +67,29 @@ router.post("/login", async (req, res) => {
 
     // validation
     if (!email || !password)
-      return res.status(400).json({ msg: "Not All Field Have Been Populated" });
+      return res
+        .status(400)
+        .json({ msg: "Not All Fields Have Been Populated" });
+
+    const user = await User.findOne({ email: email });
+    if (!user)
+      return res.status(400).json({
+        msg: "No Account with this Email Address has been Registered",
+      });
+    // match passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ msg: "Invalid Credentials" });
+
+    // json web token attached to secret
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        displayName: user.displayName,
+        emaIl: user.email,
+      },
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
