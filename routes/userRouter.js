@@ -4,6 +4,7 @@ const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 // jason web token package
 const jwt = require("jsonwebtoken");
+const auth = require("../middleware/auth");
 // require userModel
 const User = require("../models/userModel");
 
@@ -90,6 +91,35 @@ router.post("/login", async (req, res) => {
         emaIl: user.email,
       },
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// delete route: user can delete their own account
+router.delete("/delete", auth, async (req, res) => {
+  // test to see the token id
+  // console.log(req.user);
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.user);
+    res.json(deletedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// do we have a valid token & advise if the user is logged in
+router.post("/tokenIsValid", async (req, res) => {
+  try {
+    const token = req.header("x-auth-token");
+    if (!token) return res.json(false);
+
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    if (!verified) return res.json(false);
+
+    const user = await User.findById(verified.id);
+    if (!user) return res.json(false);
+    return res.json(true);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
